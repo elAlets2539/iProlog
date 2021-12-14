@@ -9,7 +9,6 @@ import Foundation
 
 class Query {
     
-    //private static var answers = Dictionary<String, String>()
     private static var answers = [Dictionary<String, String>]()
     
     static func ask(_ name: String, _ args: [String]) -> Bool {
