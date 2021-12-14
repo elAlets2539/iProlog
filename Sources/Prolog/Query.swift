@@ -9,7 +9,8 @@ import Foundation
 
 class Query {
     
-    private static var answers = Dictionary<String, String>()
+    //private static var answers = Dictionary<String, String>()
+    private static var answers = [Dictionary<String, String>]()
     
     static func ask(_ name: String, _ args: [String]) -> Bool {
         
@@ -68,31 +69,35 @@ class Query {
     private static func solveVariable(_ name: String, _ args: [String]) -> Bool {
         
         var indexes = getVariablesIndexes(args)
-        answers = [:]
+        answers = []
         var i = 0
         
         while (i<KnowledgeBase.size()) {
             
+            var answer = Dictionary<String, String>()
             let element = KnowledgeBase.getElement(at: i)
             
             if (element.name == name && element.atoms.count == args.count) {
                 
-                
                 for j in 0..<args.count {
                     
                     if (!isAVariable(args[j]) && element.atoms[j] != args[j]) {
-                        answers = [:]
+                        answer = [:]
                         break
                     }
                     if (j == indexes.first) {
                         
-                        answers[args[j]] = element.atoms[j]
+                        answer[args[j]] = element.atoms[j]
                         indexes.removeFirst()
                         
                     }
                     
                 }
                 
+            }
+            
+            if (!answer.isEmpty) {
+                answers.append(answer)
             }
             
             i += 1
@@ -125,7 +130,7 @@ class Query {
         
     }
     
-    static func getVariables() -> Dictionary<String, String> {
+    static func getVariables() -> [Dictionary<String, String>] {
         
         return answers
         
