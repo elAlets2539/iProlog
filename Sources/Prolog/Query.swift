@@ -67,12 +67,13 @@ class Query {
     
     private static func solveVariable(_ name: String, _ args: [String]) -> Bool {
         
-        var indexes = getVariablesIndexes(args)
+        let indexList = getVariablesIndexes(args)
         answers = []
         var i = 0
         
         while (i<KnowledgeBase.size()) {
             
+            var indexes = indexList
             var answer = Dictionary<String, String>()
             let element = KnowledgeBase.getElement(at: i)
             
@@ -96,6 +97,7 @@ class Query {
             }
             
             if (!answer.isEmpty) {
+                print(answer)
                 answers.append(answer)
             }
             
@@ -103,7 +105,6 @@ class Query {
             
         }
         
-        print(answers)
         return true
         
     }

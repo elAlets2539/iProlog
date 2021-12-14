@@ -44,7 +44,8 @@ public struct Prolog {
         //KnowledgeBase.displayKB()
         
         //print(Query.ask("parent", ["charles1", "george1"]))
-        print(Query.ask("parent", ["charles1", "X"]))
+        //print(Query.ask("parent", ["charles1", "X"]))
+        print(Query.ask("parent", ["X", "charles1"]))
         
         print()
         
