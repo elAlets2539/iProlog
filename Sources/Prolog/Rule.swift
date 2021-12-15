@@ -6,3 +6,19 @@
 //
 
 import Foundation
+
+struct Rule {
+    
+    let name : String
+    let atoms : [String]
+    let conditions : [Fact]
+    
+    init(_ name: String, _ args: [String], _ conditions: [Fact]) {
+        
+        self.name = name
+        atoms = args
+        self.conditions = conditions
+        
+    }
+    
+}

@@ -10,6 +10,7 @@ public struct Prolog {
         KnowledgeBase.add(Fact("man", ["matt"]))
         KnowledgeBase.add(Fact("likes", ["tom", "susan"]))
         KnowledgeBase.add(Fact("likes", ["tom", "susan", "sam", "matt", "karen"]))
+        KnowledgeBase.add(Fact("likes", ["tom", "susana", "sam", "mateo", "karena"]))
         
         KnowledgeBase.displayKB()
         
@@ -21,6 +22,7 @@ public struct Prolog {
         print(Query.ask("likes", ["tom", "Who"]))
         print(Query.ask("likes", ["tom", "S", "sam", "X", "K"]))
         */
+        /*
         print()
         
         KnowledgeBase.add(Fact("male", ["james1"]))
@@ -46,8 +48,16 @@ public struct Prolog {
         //print(Query.ask("parent", ["charles1", "george1"]))
         //print(Query.ask("parent", ["charles1", "X"]))
         print(Query.ask("parent", ["X", "charles1"]))
+        */
         
         print()
+        
+        KnowledgeBase.add(Fact("parent", ["chayanne", "X"]))
+        KnowledgeBase.displayKB()
+        print(Query.ask("parent", ["chayanne", "alex"]))
+        
+        print()
+        
         
     }
     

@@ -12,7 +12,7 @@ class Query {
     private static var answers = [Dictionary<String, String>]()
     
     static func ask(_ name: String, _ args: [String]) -> Bool {
-        
+        /*
         if (theresAVariable(args)) {
             
             return solveVariable(name, args)
@@ -36,7 +36,63 @@ class Query {
         }
         
         return false
+        */
+        let indexList = getVariablesIndexes(args)
+        answers = []
+        var i = 0
         
+        while (i<KnowledgeBase.size()) {
+            
+            var indexes = indexList
+            var answer = Dictionary<String, String>()
+            let element = KnowledgeBase.getElement(at: i)
+            
+            if (element.name == name && element.atoms == args) {
+                return true
+            }
+            
+            if (element.name == name && element.atoms.count == args.count) {
+                
+                for j in 0..<args.count {
+                    
+                    if (!isAVariable(args[j]) && !isAVariable(element.atoms[j]) && element.atoms[j] != args[j]) {
+                        answer = [:]
+                        break
+                    }
+                    if (j == indexes.first) {
+                        
+                        answer[args[j]] = element.atoms[j]
+                        indexes.removeFirst()
+                        
+                    } else if (isAVariable(element.atoms[j])) {
+                        
+                        answer[args[j]] = element.atoms[j]
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            if (!answer.isEmpty) {
+                
+                answers.append(answer)
+                
+                if (!isAVariable(answer.values.first!)) {
+                    print(answer)
+                }
+                
+            }
+            
+            i += 1
+            
+        }
+        
+        if (!answers.isEmpty) {
+            return true
+        } else {
+            return false
+        }
     }
     
     private static func theresAVariable(_ atoms: [String]) -> Bool {
@@ -77,6 +133,10 @@ class Query {
             var answer = Dictionary<String, String>()
             let element = KnowledgeBase.getElement(at: i)
             
+            if (element.name == name && element.atoms == args) {
+                return true
+            }
+            
             if (element.name == name && element.atoms.count == args.count) {
                 
                 for j in 0..<args.count {
@@ -89,6 +149,10 @@ class Query {
                         
                         answer[args[j]] = element.atoms[j]
                         indexes.removeFirst()
+                        
+                    } else if (isAVariable(element.atoms[j])) {
+                        
+                        answer[args[j]] = element.atoms[j]
                         
                     }
                     
@@ -105,7 +169,11 @@ class Query {
             
         }
         
-        return true
+        if (!answers.isEmpty) {
+            return true
+        } else {
+            return false
+        }
         
     }
     
