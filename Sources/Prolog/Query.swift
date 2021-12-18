@@ -1,10 +1,9 @@
 //
 //  Query.swift
-//  
+//
 //
 //  Created by Alejandro Sosa Carrillo on 09/12/21.
 //
-
 import Foundation
 
 class Query {
@@ -55,17 +54,12 @@ class Query {
                                     newArgs.append(atom)
                                 }
                             }
-                            print("-----")
-                            print(condition.name)
-                            print(newArgs)
-                            print("-----")
+
                             if (!ask(condition.name, newArgs)) {
                                 answer = [:]
                                 break
                             } else {
-                                conditionAnswers = getVariables()
-                                print("xxxx")
-                                print(conditionAnswers)
+                                conditionAnswers = getAnswers()
                             }
                             
                         }
@@ -81,19 +75,13 @@ class Query {
                                 argsIndexes.append(atom)
                             }
                         }
-                        print("----------------------")
-                        print(condition.name)
-                        print(argsIndexes)
-                        print("----------------------")
+                        
                         if (!ask(condition.name, argsIndexes)) {
                             answer = [:]
                             break
                         } else {
-                            print(argsIndexes[0] + " es el gfe de " + argsIndexes[1])
-                            conditionAnswers = getVariables()
+                            conditionAnswers = getAnswers()
                             answer["A"] = "A"
-                            //print("****")
-                            //print(conditionAnswers)
                         }
                         
                     }
@@ -105,12 +93,7 @@ class Query {
             if (!answer.isEmpty) {
                 
                 answers.append(answer)
-                print("ñññ")
-                print(answers)
                 return true
-                //if (!isAVariable(answer.values.first!)) {
-                    //print(answer)
-                //}
                 
             }
             
@@ -268,7 +251,7 @@ class Query {
         
     }
     
-    static func getVariables() -> [Dictionary<String, String>] {
+    static func getAnswers() -> [Dictionary<String, String>] {
         
         return answers
         
