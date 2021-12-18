@@ -10,42 +10,138 @@ import Foundation
 class Query {
     
     private static var answers = [Dictionary<String, String>]()
+    private static var ruleFlag = false
     
     static func ask(_ name: String, _ args: [String]) -> Bool {
-        /*
-        if (theresAVariable(args)) {
-            
-            return solveVariable(name, args)
-            
-        } else {
-            
-            var i = 0
-            
-            while (i<KnowledgeBase.size()) {
-                
-                let element = KnowledgeBase.getElement(at: i)
-                
-                if (element.name == name && element.atoms == args) {
-                    return true
-                }
-                
-                i += 1
-                
-            }
-            
+        
+        answers = []
+        ruleFlag = false
+        
+        /// ------------------------------------------------------------------------------------- Check facts
+        
+        if (factIsTrue(name, args)) {
+            return true
         }
         
-        return false
-        */
-        let indexList = getVariablesIndexes(args)
+        /// ------------------------------------------------------------------------------------- Check rules
+        
         answers = []
         var i = 0
         
-        while (i<KnowledgeBase.size()) {
+        while (i < KnowledgeBase.rulesSize()) {
             
-            var indexes = indexList
             var answer = Dictionary<String, String>()
-            let element = KnowledgeBase.getElement(at: i)
+            let element = KnowledgeBase.getRule(at: i)
+            ruleFlag = true
+            
+            if (element.name == name && element.atoms.count == args.count) {
+                
+                var conditionAnswers = [Dictionary<String, String>]()
+                
+                for condition in element.conditions {
+                    
+                    if (!conditionAnswers.isEmpty) {
+                        
+                        for possibleAnswer in conditionAnswers {
+                            
+                            var newArgs = [String]()
+                            
+                            for atom in condition.atoms {
+                                if possibleAnswer.keys.contains(atom) {
+                                    newArgs.append(possibleAnswer[atom]!)
+                                } else if (element.atoms.contains(atom)) {
+                                    newArgs.append(args[element.atoms.firstIndex(of: atom)!])
+                                } else {
+                                    newArgs.append(atom)
+                                }
+                            }
+                            print("-----")
+                            print(condition.name)
+                            print(newArgs)
+                            print("-----")
+                            if (!ask(condition.name, newArgs)) {
+                                answer = [:]
+                                break
+                            } else {
+                                conditionAnswers = getVariables()
+                                print("xxxx")
+                                print(conditionAnswers)
+                            }
+                            
+                        }
+                        
+                    } else {
+                        
+                        var argsIndexes = [String]()
+                        
+                        for atom in condition.atoms {
+                            if (element.atoms.contains(atom)) {
+                                argsIndexes.append(args[element.atoms.firstIndex(of: atom)!])
+                            } else {
+                                argsIndexes.append(atom)
+                            }
+                        }
+                        print("----------------------")
+                        print(condition.name)
+                        print(argsIndexes)
+                        print("----------------------")
+                        if (!ask(condition.name, argsIndexes)) {
+                            answer = [:]
+                            break
+                        } else {
+                            print(argsIndexes[0] + " es el gfe de " + argsIndexes[1])
+                            conditionAnswers = getVariables()
+                            answer["A"] = "A"
+                            //print("****")
+                            //print(conditionAnswers)
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            if (!answer.isEmpty) {
+                
+                answers.append(answer)
+                print("ñññ")
+                print(answers)
+                return true
+                //if (!isAVariable(answer.values.first!)) {
+                    //print(answer)
+                //}
+                
+            }
+            
+            i += 1
+            
+        }
+        
+        /// ------------------------------------------------------------------------------------- Check if there are any answers
+        
+        if (!answers.isEmpty) {
+            return true
+        } else {
+            return false
+        }
+        
+    }
+    
+    private static func factIsTrue(_ name: String, _ args: [String]) -> Bool {
+        
+        let varIndexList = getVariablesIndexes(args)
+        let atomIndexList = getAtomsIndexes(args)
+        
+        var i = 0
+        
+        while (i < KnowledgeBase.factsSize()) {
+            
+            var varIndexes = varIndexList
+            var atomIndexes = atomIndexList
+            
+            var answer = Dictionary<String, String>()
+            let element = KnowledgeBase.getFact(at: i)
             
             if (element.name == name && element.atoms == args) {
                 return true
@@ -59,15 +155,22 @@ class Query {
                         answer = [:]
                         break
                     }
-                    if (j == indexes.first) {
+                    if (j == varIndexes.first) {
                         
                         answer[args[j]] = element.atoms[j]
-                        indexes.removeFirst()
+                        varIndexes.removeFirst()
                         
-                    } else if (isAVariable(element.atoms[j])) {
+                    } else if (isAVariable(element.atoms[j]) && j != atomIndexes.first) {
                         
                         answer[args[j]] = element.atoms[j]
+                        atomIndexes.removeFirst()
                         
+                    } else if (element.atoms[j] == args[j]) {
+                        
+                        continue
+                        
+                    } else {
+                        answer = [:]
                     }
                     
                 }
@@ -78,7 +181,7 @@ class Query {
                 
                 answers.append(answer)
                 
-                if (!isAVariable(answer.values.first!)) {
+                if (!isAVariable(answer.values.first!) && !ruleFlag) {
                     print(answer)
                 }
                 
@@ -93,6 +196,8 @@ class Query {
         } else {
             return false
         }
+        
+        
     }
     
     private static func theresAVariable(_ atoms: [String]) -> Bool {
@@ -121,62 +226,6 @@ class Query {
         
     }
     
-    private static func solveVariable(_ name: String, _ args: [String]) -> Bool {
-        
-        let indexList = getVariablesIndexes(args)
-        answers = []
-        var i = 0
-        
-        while (i<KnowledgeBase.size()) {
-            
-            var indexes = indexList
-            var answer = Dictionary<String, String>()
-            let element = KnowledgeBase.getElement(at: i)
-            
-            if (element.name == name && element.atoms == args) {
-                return true
-            }
-            
-            if (element.name == name && element.atoms.count == args.count) {
-                
-                for j in 0..<args.count {
-                    
-                    if (!isAVariable(args[j]) && element.atoms[j] != args[j]) {
-                        answer = [:]
-                        break
-                    }
-                    if (j == indexes.first) {
-                        
-                        answer[args[j]] = element.atoms[j]
-                        indexes.removeFirst()
-                        
-                    } else if (isAVariable(element.atoms[j])) {
-                        
-                        answer[args[j]] = element.atoms[j]
-                        
-                    }
-                    
-                }
-                
-            }
-            
-            if (!answer.isEmpty) {
-                print(answer)
-                answers.append(answer)
-            }
-            
-            i += 1
-            
-        }
-        
-        if (!answers.isEmpty) {
-            return true
-        } else {
-            return false
-        }
-        
-    }
-    
     private static func getVariablesIndexes(_ args: [String]) -> [Int] {
         
         var indexes = [Int]()
@@ -187,6 +236,27 @@ class Query {
             let index = i.index(i.startIndex, offsetBy: 0)
             
             if i[index].isUppercase {
+                indexes.append(j)
+            }
+            
+            j += 1
+            
+        }
+        
+        return indexes
+        
+    }
+    
+    private static func getAtomsIndexes(_ args: [String]) -> [Int] {
+        
+        var indexes = [Int]()
+        var j = 0
+        
+        for i in args {
+            
+            let index = i.index(i.startIndex, offsetBy: 0)
+            
+            if i[index].isLowercase {
                 indexes.append(j)
             }
             
